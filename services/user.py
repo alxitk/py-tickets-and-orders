@@ -6,7 +6,7 @@ def create_user(username: str,
                 email: str = None,
                 first_name: str = None,
                 last_name: str = None
-                ) -> None:
+                ) -> User:
     user = User.objects.create_user(
         username=username,
         password=password,

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from django.db import transaction
@@ -11,7 +12,8 @@ def create_order(tickets: List[dict], username: str, date: str = None) -> None:
         order = Order.objects.create(user=user)
 
         if date:
-            order.created_at = date
+
+            order.created_at = datetime.strptime(date, "%Y-%m-%d %H:%M")
             order.save()
 
         for ticket in tickets:
