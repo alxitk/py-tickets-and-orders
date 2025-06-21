@@ -5,26 +5,23 @@ from django.db import transaction
 from django.db.models import QuerySet
 from db.models import Ticket, Order, User, MovieSession
 
-
+@transaction.atomic
 def create_order(tickets: List[dict], username: str, date: str = None) -> None:
-    with transaction.atomic():
-        user = User.objects.get(username=username)
-        order = Order.objects.create(user=user)
+    user = User.objects.get(username=username)
+    order = Order.objects.create(user=user)
 
-        if date:
+    if date:
+        order.created_at = datetime.strptime(date, "%Y-%m-%d %H:%M")
+        order.save()
 
-            order.created_at = datetime.strptime(date, "%Y-%m-%d %H:%M")
-            order.save()
-
-        for ticket in tickets:
-            movie_session = MovieSession.objects.get(
-                id=ticket["movie_session"]
-            )
-            Ticket.objects.create(order=order,
-                                  movie_session=movie_session,
-                                  row=ticket["row"],
-                                  seat=ticket["seat"]
-                                  )
+    for ticket in tickets:
+        movie_session = MovieSession.objects.get(
+            id=ticket["movie_session"]
+        )
+        Ticket.objects.create(order=order,
+                              movie_session=movie_session,
+                              row=ticket["row"],
+                              seat=ticket["seat"])
 
 
 def get_orders(username: str = None) -> QuerySet[Order]:
